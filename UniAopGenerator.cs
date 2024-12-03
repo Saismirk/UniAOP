@@ -124,6 +124,9 @@ namespace {namespaceName} {{");
             "UniAOP.Runtime.MethodEnterAspectAttribute" => new MethodEnterAspectProvider(),
             "UniAOP.Runtime.MethodExitAspectAttribute" => new MethodExitAspectProvider(),
             "UniAOP.Runtime.MethodBoundaryAspectAttribute" => new MethodBoundaryAspectProvider(),
+            // "UniAOP.Runtime.ExceptionAspectAttribute" => new ExceptionAspectProvider(),
+            "UniAOP.Runtime.MethodValidationAspectAttribute" => new MethodValidationAspectProvider(),
+            "UniAOP.Runtime.MethodValidationAsyncAspectAttribute" => new MethodValidationAsyncAspectProvider(),
             _ => null
         };
         

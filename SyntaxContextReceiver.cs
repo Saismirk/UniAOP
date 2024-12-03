@@ -13,6 +13,9 @@ public class SyntaxContextReceiver : ISyntaxContextReceiver {
     public static readonly HashSet<string> ValidAspects = new() { 
         "UniAOP.Runtime.MethodEnterAspectAttribute", 
         "UniAOP.Runtime.MethodExitAspectAttribute", 
+        "UniAOP.Runtime.ExceptionAspectAttribute",
+        "UniAOP.Runtime.MethodValidationAspectAttribute",
+        "UniAOP.Runtime.MethodValidationAsyncAspectAttribute",
         "UniAOP.Runtime.MethodBoundaryAspectAttribute" 
     };
     public List<(ISymbol methodSymbol, MethodDeclarationSyntax classSyntax)> ValidMethods { get; } = new();
