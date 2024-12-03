@@ -10,6 +10,11 @@ namespace UniAOP;
 
 public class SyntaxContextReceiver : ISyntaxContextReceiver {
     internal static ISyntaxContextReceiver Create() => new SyntaxContextReceiver();
+    public static readonly HashSet<string> ValidAspects = new() { 
+        "UniAOP.Runtime.MethodEnterAspectAttribute", 
+        "UniAOP.Runtime.MethodExitAspectAttribute", 
+        "UniAOP.Runtime.MethodBoundaryAspectAttribute" 
+    };
     public List<(ISymbol methodSymbol, MethodDeclarationSyntax classSyntax)> ValidMethods { get; } = new();
     public StringBuilder Logs { get; } = new();
     public int MethodsVisited { get; set; }
@@ -44,9 +49,5 @@ public class SyntaxContextReceiver : ISyntaxContextReceiver {
         }
     }
 
-    private static bool IsValidAttribute(AttributeData attributeData) =>
-        attributeData.AttributeClass?.BaseType?.ToDisplayString()
-            is "UniAOP.Runtime.MethodEnterAspectAttribute"
-            or "UniAOP.Runtime.MethodExitAspectAttribute"
-            or "UniAOP.Runtime.MethodBoundaryAspectAttribute";
+    private static bool IsValidAttribute(AttributeData attributeData) => ValidAspects.Contains(attributeData.AttributeClass?.BaseType?.ToDisplayString());
 }
