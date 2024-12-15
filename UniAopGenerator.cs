@@ -25,29 +25,27 @@ public class UniAopGenerator : ISourceGenerator {
                                + $"\nVisited: {receiver.MethodsVisited}"
                                + $"\n{receiver.Logs}");
 #endif
-        ProcessAttribute(context, receiver);
-        
+        ProcessAttributes(context, receiver);
+
 #if DEBUG
         Utils.SaveSourceToPath("E:/Logs.txt", Logs.ToString());
 #endif
     }
 
-    private static void ProcessAttribute(GeneratorExecutionContext context, SyntaxContextReceiver receiver) {
+    private static void ProcessAttributes(GeneratorExecutionContext context, SyntaxContextReceiver receiver) {
         _context = context;
         try {
-            
             if (receiver.ValidMethods.Count is 0) {
                 return;
             }
 
             foreach (var methodData in receiver.ValidMethods) {
-                //TODO: Limitation: Only one aspect attribute allowed per method.
                 var attributeData = methodData.methodSymbol
                                               .GetAttributes()
-                                              .FirstOrDefault(a => SyntaxContextReceiver.ValidAspects.Contains(a.AttributeClass?.BaseType?.ToDisplayString()));
+                                              .Where(a => SyntaxContextReceiver.ValidAspects.Contains(a.AttributeClass?.BaseType?.ToDisplayString()));
                 Logs.AppendLine($"Processing: {methodData.methodSymbol.ToDisplayString()}");
-                var classSource = ProcessClass(methodData.methodSymbol, attributeData, methodData.classSyntax);
-                var attributeName = attributeData.AttributeClass?.MetadataName ?? string.Empty;
+                var classSource = ProcessClasses(methodData.methodSymbol, attributeData, methodData.classSyntax);
+                var attributeName = methodData.methodSymbol.Name;
                 var attributeDisplayName = attributeName.Replace("Attribute", "").Replace("UniAOP.Runtime.", "");
                 if (string.IsNullOrEmpty(classSource)) {
                     Logs.AppendLine($"{methodData.methodSymbol.ToDisplayString()} class generation failed for {attributeName}");
@@ -55,7 +53,7 @@ public class UniAopGenerator : ISourceGenerator {
                 }
 
                 var namespaceName = methodData.methodSymbol.ContainingNamespace?.Name ?? "global";
-                var className = methodData.methodSymbol.Name;
+                var className = methodData.methodSymbol.ContainingSymbol.Name;
                 context.AddSource($"{namespaceName}_{className}_{attributeDisplayName}.g.cs", SourceText.From(classSource, Encoding.UTF8));
 #if DEBUG
                 Utils.SaveSourceToPath($"E:/{namespaceName}_{className}_{attributeDisplayName}.g.txt", classSource);
@@ -67,11 +65,11 @@ public class UniAopGenerator : ISourceGenerator {
         }
     }
 
-    private static string ProcessClass(ISymbol methodSymbol, AttributeData attributeData, MethodDeclarationSyntax classSyntax) {
+    private static string ProcessClasses(ISymbol methodSymbol, IEnumerable<AttributeData> attributeData, MethodDeclarationSyntax classSyntax) {
         var source = new StringBuilder();
 
         try {
-            if (!GenerateClass(methodSymbol, attributeData, classSyntax, source)) return string.Empty;
+            if (!GenerateClasses(methodSymbol, attributeData, classSyntax, source)) return string.Empty;
         }
         catch (Exception e) {
             source.AppendLine($@"/*Error: {e.Message}*/");
@@ -81,13 +79,14 @@ public class UniAopGenerator : ISourceGenerator {
         return source.ToString();
     }
 
-    private static bool GenerateClass(ISymbol methodSymbol, AttributeData attributeData, MethodDeclarationSyntax methodSyntax, StringBuilder sourceBuilder) {
+    private static bool GenerateClasses(ISymbol methodSymbol, IEnumerable<AttributeData> attributeData, MethodDeclarationSyntax methodSyntax,
+        StringBuilder sourceBuilder) {
         var attributes = methodSymbol.GetAttributes();
         if (attributes.Count() is 0) {
             Logs.AppendLine($"Skipping: {methodSymbol.ToDisplayString()}. No attributes found:");
             return false;
         }
-        
+
         if (attributeData is null) {
             Logs.AppendLine($"Skipping: {methodSymbol.ToDisplayString()}. No valid attribute found.");
             return false;
@@ -119,18 +118,11 @@ using System.Collections.Generic;
 namespace {namespaceName} {{");
         }
 
-        sourceBuilder.AppendLine($@"    public partial class {className} {{");
-        IAspectProvider aspectProvider = attributeData.AttributeClass?.BaseType?.ToDisplayString() switch {
-            "UniAOP.Runtime.MethodEnterAspectAttribute" => new MethodEnterAspectProvider(),
-            "UniAOP.Runtime.MethodExitAspectAttribute" => new MethodExitAspectProvider(),
-            "UniAOP.Runtime.MethodBoundaryAspectAttribute" => new MethodBoundaryAspectProvider(),
-            // "UniAOP.Runtime.ExceptionAspectAttribute" => new ExceptionAspectProvider(),
-            "UniAOP.Runtime.MethodValidationAspectAttribute" => new MethodValidationAspectProvider(),
-            "UniAOP.Runtime.MethodValidationAsyncAspectAttribute" => new MethodValidationAsyncAspectProvider(),
-            _ => null
-        };
-        
-        aspectProvider?.Generate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeData, isAsync);
+        sourceBuilder.AppendLine($@"    public partial class {className} {{
+        {methodModifiers} {methodReturnType} _{methodName} ({methodArgs}) {{");
+        using var attributeIterator = attributeData.GetEnumerator();
+        AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeIterator, isAsync);
+        sourceBuilder.AppendLine($@"        }}");
         sourceBuilder.AppendLine(namespaceSymbol.IsGlobalNamespace ? "}" : "\t}");
         if (!namespaceSymbol.IsGlobalNamespace) {
             sourceBuilder.AppendLine("}");

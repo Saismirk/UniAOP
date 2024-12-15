@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
@@ -9,15 +10,13 @@ public class MethodEnterAspectProvider : IAspectProvider {
         string methodArgs,
         string methodReturnType,
         string methodModifiers,
-        AttributeData attributeData,
+        IEnumerator<AttributeData> attributeDataIter,
         bool isAsync) {
+        var attributeData = attributeDataIter.Current;
         if (attributeData?.AttributeClass is null) return;
         sourceBuilder.AppendLine($@"
-        {methodModifiers} {methodReturnType} {methodName}{attributeData.AttributeClass.Name.Replace("Aspect", "")} ({methodArgs}) {{ 
-            var attribute = new {attributeData.AttributeClass.Name}();
-            attribute.OnMethodEnter();
-            {(isAsync ? "await " : "")}{methodName}({methodArgs});
-        }}
-");
+            var _{nameof(MethodEnterAspectProvider)} = new {attributeData.AttributeClass.Name}();
+            attribute.OnMethodEnter();");
+        AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeDataIter, isAsync);
     }
 }

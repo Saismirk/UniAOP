@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
@@ -9,15 +10,13 @@ public class MethodExitAspectProvider : IAspectProvider {
         string methodArgs,
         string methodReturnType,
         string methodModifiers,
-        AttributeData attributeData,
+        IEnumerator<AttributeData> attributeDataIter,
         bool isAsync) {
+        var attributeData = attributeDataIter.Current;
         if (attributeData?.AttributeClass is null) return;
         sourceBuilder.AppendLine($@"
-        {methodModifiers} {methodReturnType} {methodName}{attributeData.AttributeClass.Name.Replace("Aspect", "")} ({methodArgs}) {{ 
-            var attribute = new {attributeData.AttributeClass.Name}();
-            {(isAsync ? "await " : "")}{methodName}({methodArgs});
-            attribute.OnMethodExit();
-        }}
-");
+            var _{attributeData.AttributeClass.Name} = new {attributeData.AttributeClass.Name}();");
+        AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeDataIter, isAsync);
+        sourceBuilder.AppendLine($@"            _{attributeData.AttributeClass.Name}.OnMethodExit();");
     }
 }

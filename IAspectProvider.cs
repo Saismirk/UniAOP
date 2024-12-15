@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
@@ -9,6 +10,6 @@ public interface IAspectProvider {
         string methodArgs,
         string methodReturnType,
         string methodModifiers,
-        AttributeData attributeData,
+        IEnumerator<AttributeData> attributeDataIter,
         bool isAsync);
 }

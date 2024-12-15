@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
@@ -9,18 +10,16 @@ public class MethodValidationAspectProvider : IAspectProvider {
         string methodArgs,
         string methodReturnType,
         string methodModifiers,
-        AttributeData attributeData,
+        IEnumerator<AttributeData> attributeDataIter,
         bool isAsync) {
+        var attributeData = attributeDataIter.Current;
         if (attributeData?.AttributeClass is null) return;
         sourceBuilder.AppendLine($@"
-        {methodModifiers} {methodReturnType} {methodName}{attributeData.AttributeClass.Name.Replace("Aspect", "")} ({methodArgs}) {{ 
-            var attribute = new {attributeData.AttributeClass.Name}();
-            if (!attribute.ValidateMethod({methodArgs})) {{
+            var  _{attributeData.AttributeClass.Name} = new {attributeData.AttributeClass.Name}();
+            if (!_{attributeData.AttributeClass.Name}.ValidateMethod({methodArgs})) {{
                 return;
             }};
-
-            {(isAsync ? "await " : "")}{methodName}({methodArgs});
-        }}
 ");
+        AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeDataIter, isAsync);
     }
 }
