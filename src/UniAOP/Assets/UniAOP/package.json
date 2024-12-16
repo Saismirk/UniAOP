@@ -1,0 +1,11 @@
+{
+  "name": "com.sai.uniaop",
+  "displayName": "UniAOP",
+  "author": { "name": "Sai" },
+  "version": "0.2.0",
+  "unity": "6000.0.29f1",
+  "description": "Source-Generated AOP framework for Unity",
+  "keywords": [ "SourceGenerator", "AOP", "Framework" ],
+  "license": "MIT",
+  "category": "Framework"
+}

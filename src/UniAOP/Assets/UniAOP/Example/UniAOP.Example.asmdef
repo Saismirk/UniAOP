@@ -1,0 +1,16 @@
+{
+    "name": "UniAOP.Example",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ebed0894ca5f4bdf991f9aabfebbaddf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
