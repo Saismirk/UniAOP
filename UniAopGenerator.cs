@@ -102,6 +102,7 @@ public class UniAopGenerator : ISourceGenerator {
         var className = classDeclaration.Identifier.Text;
         var isAsync = methodSyntax.Modifiers.Any(m => m.ToString() == "async");
         var methodName = methodSyntax.Identifier.Text;
+        var methodNameAop = methodName[0] is '_' ? methodName.Substring(1) : $"_{methodName}";
         var methodArgs = string.Join(", ", methodSyntax.ParameterList.Parameters.Select(p => p.Identifier.Text));
         var methodReturnType = _context?.Compilation
                                        .GetSemanticModel(methodSyntax.ReturnType.SyntaxTree)
@@ -119,7 +120,7 @@ namespace {namespaceName} {{");
         }
 
         sourceBuilder.AppendLine($@"    public partial class {className} {{
-        {methodModifiers} {methodReturnType} _{methodName} ({methodArgs}) {{");
+        {methodModifiers} {methodReturnType} {methodNameAop} ({methodArgs}) {{");
         if (!AspectProviderUtils.IsVoid(methodReturnType)) {
             var returnType = AspectProviderUtils.GetTaskReturnType(methodReturnType);
             sourceBuilder.AppendLine($@"            {returnType} result = default({returnType});");

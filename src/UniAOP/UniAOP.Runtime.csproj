@@ -41,7 +41,7 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="F:\Programming\UniAOPUnity\Project\UniAOP\Assets\UniAOP\Plugins\UniAOP.dll" />
+    <Analyzer Include="F:\Programming\UniAOP\src\UniAOP\Assets\UniAOP\Plugins\UniAOP.dll" />
     <Analyzer Include="C:\Program Files\UnityEditors\6000.0.29f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\UnityEditors\6000.0.29f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\UnityEditors\6000.0.29f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -409,7 +409,7 @@
       <HintPath>C:\Program Files\UnityEditors\6000.0.29f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>F:\Programming\UniAOPUnity\Project\UniAOP\Library\PackageCache\com.unity.ext.nunit\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>F:\Programming\UniAOP\src\UniAOP\Library\PackageCache\com.unity.ext.nunit\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\UnityEditors\6000.0.29f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>

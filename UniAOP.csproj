@@ -13,4 +13,16 @@
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="src\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="src\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="src\**" />
+    </ItemGroup>
+
 </Project>
