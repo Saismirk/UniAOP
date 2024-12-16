@@ -7,12 +7,12 @@ namespace UniAOP;
 public static class AspectProviderUtils {
     public static IAspectProvider GetAspectProvider(AttributeData attribute) =>
         attribute?.AttributeClass?.BaseType?.ToDisplayString() switch {
-            "UniAOP.Runtime.MethodEnterAspectAttribute" => new MethodEnterAspectProvider(),
-            "UniAOP.Runtime.MethodExitAspectAttribute" => new MethodExitAspectProvider(),
-            "UniAOP.Runtime.MethodBoundaryAspectAttribute" => new MethodBoundaryAspectProvider(),
-            // "UniAOP.Runtime.ExceptionAspectAttribute" => new ExceptionAspectProvider(),
-            "UniAOP.Runtime.MethodValidationAspectAttribute" => new MethodValidationAspectProvider(),
-            "UniAOP.Runtime.MethodValidationAsyncAspectAttribute" => new MethodValidationAsyncAspectProvider(),
+            "UniAOP.MethodEnterAspectAttribute" => new MethodEnterAspectProvider(),
+            "UniAOP.MethodExitAspectAttribute" => new MethodExitAspectProvider(),
+            "UniAOP.MethodBoundaryAspectAttribute" => new MethodBoundaryAspectProvider(),
+            "UniAOP.ExceptionAspectAttribute" => new ExceptionAspectProvider(),
+            "UniAOP.MethodValidationAspectAttribute" => new MethodValidationAspectProvider(),
+            "UniAOP.MethodValidationAsyncAspectAttribute" => new MethodValidationAsyncAspectProvider(),
             _ => null
         };
 
@@ -22,7 +22,8 @@ public static class AspectProviderUtils {
         string methodReturnType,
         string methodModifiers,
         IEnumerator<AttributeData> attributeDataIter,
-        bool isAsync) {
+        bool isAsync,
+        int indent = 0) {
         if (attributeDataIter.MoveNext()) {
             GetAspectProvider(attributeDataIter.Current)?.Generate(ref sourceBuilder, 
                                                                    methodName, 
@@ -32,7 +33,19 @@ public static class AspectProviderUtils {
                                                                    attributeDataIter, 
                                                                    isAsync);
         } else {
-            sourceBuilder.AppendLine($@"            {(isAsync ? "await " : "")}{methodName}({methodArgs});");
+            var indentStr = new string('\t', indent);
+            sourceBuilder.AppendLine($@"            {indentStr}{(IsVoid(methodReturnType) ? "" : "result = ")}{(isAsync ? "await " : "")}{methodName}({methodArgs});");
         }
+    }
+
+    public static bool IsVoid(string methodReturnType) => methodReturnType == "void" 
+                                                          || methodReturnType.EndsWith("UniTaskVoid")
+                                                          || methodReturnType.EndsWith("UniTask")
+                                                          || methodReturnType.EndsWith("Task");
+
+    public static string GetTaskReturnType(string methodReturnType) {
+        if (methodReturnType.StartsWith("System.Threading.Tasks.Task<")) return methodReturnType.Substring("System.Threading.Tasks.Task<".Length, methodReturnType.Length - "System.Threading.Tasks.Task<".Length - 1);
+        if (methodReturnType.StartsWith("Cysharp.Threading.Tasks.UniTask<")) return methodReturnType.Substring("UniTask<".Length, methodReturnType.Length - "UniTask<".Length - 1);
+        return methodReturnType;
     }
 }

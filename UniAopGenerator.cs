@@ -46,7 +46,7 @@ public class UniAopGenerator : ISourceGenerator {
                 Logs.AppendLine($"Processing: {methodData.methodSymbol.ToDisplayString()}");
                 var classSource = ProcessClasses(methodData.methodSymbol, attributeData, methodData.classSyntax);
                 var attributeName = methodData.methodSymbol.Name;
-                var attributeDisplayName = attributeName.Replace("Attribute", "").Replace("UniAOP.Runtime.", "");
+                var attributeDisplayName = attributeName.Replace("Attribute", "").Replace("UniAOP.", "");
                 if (string.IsNullOrEmpty(classSource)) {
                     Logs.AppendLine($"{methodData.methodSymbol.ToDisplayString()} class generation failed for {attributeName}");
                     continue;
@@ -120,8 +120,15 @@ namespace {namespaceName} {{");
 
         sourceBuilder.AppendLine($@"    public partial class {className} {{
         {methodModifiers} {methodReturnType} _{methodName} ({methodArgs}) {{");
+        if (!AspectProviderUtils.IsVoid(methodReturnType)) {
+            var returnType = AspectProviderUtils.GetTaskReturnType(methodReturnType);
+            sourceBuilder.AppendLine($@"            {returnType} result = default({returnType});");
+        }
         using var attributeIterator = attributeData.GetEnumerator();
         AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeIterator, isAsync);
+        if (!AspectProviderUtils.IsVoid(methodReturnType)) {
+            sourceBuilder.AppendLine($@"            return result;");
+        }
         sourceBuilder.AppendLine($@"        }}");
         sourceBuilder.AppendLine(namespaceSymbol.IsGlobalNamespace ? "}" : "\t}");
         if (!namespaceSymbol.IsGlobalNamespace) {

@@ -15,8 +15,8 @@ public class MethodEnterAspectProvider : IAspectProvider {
         var attributeData = attributeDataIter.Current;
         if (attributeData?.AttributeClass is null) return;
         sourceBuilder.AppendLine($@"
-            var _{nameof(MethodEnterAspectProvider)} = new {attributeData.AttributeClass.Name}();
-            attribute.OnMethodEnter();");
+            var _{attributeData.AttributeClass.Name} = new {attributeData.AttributeClass.Name}();
+            _{attributeData.AttributeClass.Name}.OnMethodEnter();");
         AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeDataIter, isAsync);
     }
 }

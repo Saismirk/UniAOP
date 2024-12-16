@@ -11,12 +11,12 @@ namespace UniAOP;
 public class SyntaxContextReceiver : ISyntaxContextReceiver {
     internal static ISyntaxContextReceiver Create() => new SyntaxContextReceiver();
     public static readonly HashSet<string> ValidAspects = new() { 
-        "UniAOP.Runtime.MethodEnterAspectAttribute", 
-        "UniAOP.Runtime.MethodExitAspectAttribute", 
-        "UniAOP.Runtime.ExceptionAspectAttribute",
-        "UniAOP.Runtime.MethodValidationAspectAttribute",
-        "UniAOP.Runtime.MethodValidationAsyncAspectAttribute",
-        "UniAOP.Runtime.MethodBoundaryAspectAttribute" 
+        "UniAOP.MethodEnterAspectAttribute", 
+        "UniAOP.MethodExitAspectAttribute", 
+        "UniAOP.ExceptionAspectAttribute",
+        "UniAOP.MethodValidationAspectAttribute",
+        "UniAOP.MethodValidationAsyncAspectAttribute",
+        "UniAOP.MethodBoundaryAspectAttribute" 
     };
     public List<(ISymbol methodSymbol, MethodDeclarationSyntax classSyntax)> ValidMethods { get; } = new();
     public StringBuilder Logs { get; } = new();

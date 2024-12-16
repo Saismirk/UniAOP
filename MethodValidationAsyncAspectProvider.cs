@@ -17,7 +17,7 @@ public class MethodValidationAsyncAspectProvider : IAspectProvider {
         sourceBuilder.AppendLine($@"
             var _{attributeData.AttributeClass.Name} = new {attributeData.AttributeClass.Name}();
             if (await _{attributeData.AttributeClass.Name}.ValidateMethod({methodArgs}) == false) {{
-                return;
+                return {(AspectProviderUtils.IsVoid(methodReturnType) ? "" : "default(" + methodReturnType + ")")};
             }}
 ");
         AspectProviderUtils.RecursiveGenerate(ref sourceBuilder, methodName, methodArgs, methodReturnType, methodModifiers, attributeDataIter, isAsync);
