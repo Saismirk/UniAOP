@@ -14,6 +14,7 @@ Install via [OpenUPM](https://openupm.com/packages/com.sai.uniaop/) or unitypack
 
 Usage
 ---
+The class containing the AOP methods has to be `partial`. Target methods also have to be non-public.
 Four types of AOPs are provided:
 - [MethodBoundaryAspect](#methodboundaryaspect)
 - [MethodEnterAspect](#methodenteraspect)
