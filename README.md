@@ -188,6 +188,7 @@ My Method
 Exit Method
 ```
 
-Limitations
+Keeping Method References
 ---
-**UniAOP** currently only works on `void` methods or `async` methods with no return values (`Task`/`UniTask`/`async void`/`UniTaskVoid`).
+The for a method `<MethodName>()`, the generated AOP method will be named `_<MethodName>()`. However, if the method name is prefixed with `_`, the generated 
+AOP method will be named `<MethodName>()`. Use this to avoid naming conflicts and retain all original method references.
